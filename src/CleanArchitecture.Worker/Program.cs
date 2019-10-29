@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using CleanArchitecture.Core.Settings;
+using CleanArchitecture.Infrastructure.Data;
 
 namespace CleanArchitecture.Worker
 {
@@ -20,8 +21,10 @@ namespace CleanArchitecture.Worker
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.AddDbContext<AppDbContext>();
                     services.AddSingleton(typeof(ILoggerAdapter<>), typeof(LoggerAdapter<>));
-                    services.AddSingleton<IEntryPointService, EntryPointService>();
+                    services.AddScoped<IEntryPointService, EntryPointService>();
+                    services.AddScoped<IRepository, Repository>();
                     services.AddSingleton<IQueueReceiver, InMemoryQueueReceiver>();
                     services.AddSingleton<IQueueSender, InMemoryQueueSender>();
 

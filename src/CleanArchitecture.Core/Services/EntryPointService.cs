@@ -11,16 +11,19 @@ namespace CleanArchitecture.Core.Services
         private readonly EntryPointSettings _settings;
         private readonly IQueueReceiver _queueReceiver;
         private readonly IQueueSender _queueSender;
+        private readonly IRepository _repository;
 
         public EntryPointService(ILoggerAdapter<EntryPointService> logger,
             EntryPointSettings settings,
             IQueueReceiver queueReceiver,
-            IQueueSender queueSender)
+            IQueueSender queueSender,
+            IRepository repository)
         {
             _logger = logger;
             _settings = settings;
             _queueReceiver = queueReceiver;
             _queueSender = queueSender;
+            _repository = repository;
         }
 
         public async Task ExecuteAsync()
@@ -32,6 +35,8 @@ namespace CleanArchitecture.Core.Services
                 await _queueReceiver.GetMessageFromQueue(_settings.ReceivingQueueName);
 
                 // do some work
+                var result = _repository.TodoItemsTotal();
+                _logger.LogInformation("Db has {total} items", result);
             }
             catch (Exception ex)
             {
